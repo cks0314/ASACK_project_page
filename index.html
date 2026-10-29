@@ -42,6 +42,10 @@
         .fr3-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px; }
         .fr3-panel .video-tile video.fr3-plot { border-top: 1px solid #e2e8f0; }
         @media (max-width: 768px) { .fr3-panel { grid-template-columns: 1fr !important; } }
+        .four-col { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 8px; }
+        .four-col .tile-label { flex-direction: column; align-items: flex-start; gap: 0.15rem; padding: 0.45rem 0.6rem; }
+        @media (max-width: 900px) { .four-col { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+        @media (max-width: 480px) { .four-col { grid-template-columns: 1fr !important; } }
     </style>
 </head>
 
@@ -536,7 +540,7 @@
                 <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart in sync</span>
             </button>
         </div>
-        <div class="compare-grid" id="grid-3r">
+        <div class="compare-grid four-col" id="grid-3r">
             <div class="video-tile is-ours">
                 <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/3r_corridor_sack.mp4" type="video/mp4"></video>
                 <div class="tile-label"><span><span class="method-dot" style="--c: var(--sack);"></span><strong>SACK (ours)</strong></span><span class="outcome safe"><i class="fas fa-check"></i> stays in corridor</span></div>
