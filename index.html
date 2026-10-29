@@ -725,26 +725,62 @@
             </div>
         </div>
 
+        <h3 class="title is-4 task-title">Corridor-constrained tracking in Gazebo</h3>
+        <div class="fr3-toolbar">
+            <div class="tabs is-toggle is-small is-toggle-rounded mb-0">
+                <ul>
+                    <li class="is-active" data-tab="nominal"><a>Nominal dynamics</a></li>
+                    <li data-tab="torque"><a>Resistive torque&nbsp; $\tau_d = -0.4\,\tau$</a></li>
+                </ul>
+            </div>
+            <button class="button is-small is-rounded is-light" data-sync-fr3>
+                <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart</span>
+            </button>
+        </div>
+        <div class="fr3-panel compare-grid three-col" id="fr3-nominal" data-panel="nominal">
+                <div class="video-tile is-ours">
+                    <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_nominal_sack.mp4" type="video/mp4"></video>
+                    <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_nominal_sack.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--sack);"></span><strong>SACK (ours)</strong></span><span class="outcome safe"><i class="fas fa-check"></i> footprint inside</span></div>
+                </div>
+                <div class="video-tile">
+                    <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_nominal_nak.mp4" type="video/mp4"></video>
+                    <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_nominal_nak.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--nak);"></span><strong>NAK</strong></span><span class="outcome safe"><i class="fas fa-check"></i> footprint inside</span></div>
+                </div>
+                <div class="video-tile">
+                    <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_nominal_nk.mp4" type="video/mp4"></video>
+                    <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_nominal_nk.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--nk);"></span><strong>NK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> corridor violation</span></div>
+                </div>
+        </div>
+        <div class="fr3-panel compare-grid three-col" id="fr3-torque" data-panel="torque" style="display:none;">
+                <div class="video-tile is-ours">
+                    <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_torque_sack.mp4" type="video/mp4"></video>
+                    <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_torque_sack.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--sack);"></span><strong>SACK (ours)</strong></span><span class="outcome safe"><i class="fas fa-check"></i> footprint inside</span></div>
+                </div>
+                <div class="video-tile">
+                    <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_torque_nak.mp4" type="video/mp4"></video>
+                    <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_torque_nak.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--nak);"></span><strong>NAK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> corridor violation</span></div>
+                </div>
+                <div class="video-tile">
+                    <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_torque_nk.mp4" type="video/mp4"></video>
+                    <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_torque_nk.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--nk);"></span><strong>NK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> corridor violation</span></div>
+                </div>
+        </div>
+        <p class="figure-caption mb-4">Top: Gazebo rendering of the FR3. Bottom: end-effector path (blue) against the reference (dashed),
+            with the projected footprint shaded and the admissible corridor outlined in orange; red segments mark violations.
+            Use the toggle to switch between nominal and disturbed dynamics.</p>
+
         <div class="figure-card mt-3">
             <img src="static/images/fr3_corridor.png" alt="FR3 corridor tracking: SACK, NAK and NK under nominal and disturbed conditions">
             <p class="figure-caption"><strong>Figure 11.</strong> (a&ndash;c) Nominal; (d&ndash;f) resistive torque $\tau_d = -0.4\,\tau$.
                 (a,d) SACK, (b,e) NAK, (c,f) NK. Red crosses mark corridor violations.</p>
         </div>
 
-        <!-- Placeholder: replace with Gazebo recordings when available, e.g.
-        <div class="compare-grid mt-4">
-            <div class="video-tile is-ours">
-                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/fr3_sack.mp4" type="video/mp4"></video>
-                <div class="tile-label"><span><strong>SACK</strong></span></div>
-            </div>
-            ...
-        </div>
-        -->
-        <div class="video-placeholder mt-4">
-            <i class="fas fa-film"></i>
-            <strong>Gazebo recordings coming soon</strong>
-            <span>SACK vs NAK vs NK on the FR3 corridor task</span>
-        </div>
     </div>
 </section>
 
@@ -925,6 +961,27 @@
         }, { threshold: 0.15 });
         document.querySelectorAll('video').forEach(v => io.observe(v));
     }
+
+
+    // FR3 condition tabs: show one panel, restart its videos together.
+    function playPanel(panel) {
+        const vids = panel.querySelectorAll('video');
+        vids.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+    }
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('[data-tab]').forEach(t => t.classList.toggle('is-active', t === tab));
+            document.querySelectorAll('.fr3-panel').forEach(p => {
+                const on = p.dataset.panel === tab.dataset.tab;
+                p.style.display = on ? '' : 'none';
+                p.querySelectorAll('video').forEach(v => v.pause());
+                if (on) playPanel(p);
+            });
+        });
+    });
+    document.querySelector('[data-sync-fr3]').addEventListener('click', () => {
+        document.querySelectorAll('.fr3-panel').forEach(p => { if (p.style.display !== 'none') playPanel(p); });
+    });
 
     // Copy BibTeX.
     document.getElementById('copy-bib').addEventListener('click', () => {
