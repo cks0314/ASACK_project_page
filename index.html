@@ -44,6 +44,7 @@
         .tb3-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 0.6rem; }
         .tb3-panel .video-tile { border: 2px solid #15803d; }
         .tb3-panel .tile-label { flex-direction: column; align-items: flex-start; gap: 0.15rem; }
+        .tb3-subhead { font-family: 'Google Sans', sans-serif; font-weight: 700; color: #0f172a; font-size: 1rem; }
         .tb3-panel video { width: 100%; height: auto; object-fit: cover; background: #0f172a; }
         /* Open circuit (side view): one run per row, wall above and empty floor below cropped away */
         .tb3-oc { grid-template-columns: 1fr; }
@@ -865,12 +866,7 @@
 
         <h3 class="title is-4 task-title mt-5">SACK on hardware</h3>
         <div class="fr3-toolbar">
-            <div class="tabs is-toggle is-small is-toggle-rounded mb-0">
-                <ul>
-                    <li class="is-active" data-group="tb3" data-tab="oc"><a>Open circuit</a></li>
-                    <li data-group="tb3" data-tab="cc"><a>Closed circuit</a></li>
-                </ul>
-            </div>
+            <p class="tb3-subhead mb-0"><i class="fas fa-route mr-2"></i>Open circuit</p>
             <button class="button is-small is-rounded is-light" data-restart="tb3">
                 <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart</span>
             </button>
@@ -889,7 +885,8 @@
                 <div class="tile-label"><span><strong>Eccentric ring</strong> &middot; left wheel</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
             </div>
         </div>
-        <div class="tab-panel tb3-panel tb3-cc" data-group="tb3" data-panel="cc" style="display:none;">
+        <p class="tb3-subhead mt-4 mb-3"><i class="fas fa-circle-notch mr-2"></i>Closed circuit</p>
+        <div class="tab-panel tb3-panel tb3-cc" data-group="tb3" data-panel="cc">
             <div class="video-tile is-ours">
                 <video muted loop playsinline preload="metadata"><source src="static/videos/sack_base_expt_2.mov" type="video/mp4"></video>
                 <div class="tile-label"><span><strong>Nominal robot</strong> &middot; no ring</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
@@ -905,7 +902,7 @@
         </div>
         <p class="figure-caption mb-0">SACK runs on the TurtleBot3 with the model trained only in Gazebo, under increasing mismatch: nominal wheels,
             an axisymmetric ring that enlarges the left wheel's effective radius, and an eccentric ring that makes it vary periodically.
-            Use the toggle to switch between the open-circuit and closed-circuit obstacle courses.</p>
+            Open-circuit runs are shown first, followed by the closed-circuit runs.</p>
 
         <div class="figure-card mt-4">
             <img src="static/images/tb3_trials_distribution.png" alt="Distribution of SACK trajectories across 20 hardware trials">
