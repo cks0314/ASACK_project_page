@@ -41,7 +41,10 @@
         .fr3-toolbar .tabs.is-toggle li.is-active a { background: #15803d; border-color: #15803d; }
         .fr3-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px; }
         .fr3-panel .video-tile video.fr3-plot { border-top: 1px solid #e2e8f0; }
-        @media (max-width: 768px) { .fr3-panel { grid-template-columns: 1fr !important; } }
+        .tb3-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 0.6rem; }
+        .tb3-panel .video-tile { border: 2px solid #15803d; }
+        .tb3-panel .tile-label { flex-direction: column; align-items: flex-start; gap: 0.15rem; }
+        @media (max-width: 768px) { .fr3-panel, .tb3-panel { grid-template-columns: 1fr !important; } }
         .four-col { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 8px; }
         .four-col .tile-label { flex-direction: column; align-items: flex-start; gap: 0.15rem; padding: 0.45rem 0.6rem; }
         @media (max-width: 900px) { .four-col { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
@@ -742,15 +745,15 @@
         <div class="fr3-toolbar">
             <div class="tabs is-toggle is-small is-toggle-rounded mb-0">
                 <ul>
-                    <li class="is-active" data-tab="nominal"><a>Nominal dynamics</a></li>
-                    <li data-tab="torque"><a>Resistive torque&nbsp; $\tau_d = -0.4\,\tau$</a></li>
+                    <li class="is-active" data-group="fr3" data-tab="nominal"><a>Nominal dynamics</a></li>
+                    <li data-group="fr3" data-tab="torque"><a>Resistive torque&nbsp; $\tau_d = -0.4\,\tau$</a></li>
                 </ul>
             </div>
-            <button class="button is-small is-rounded is-light" data-sync-fr3>
+            <button class="button is-small is-rounded is-light" data-restart="fr3">
                 <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart</span>
             </button>
         </div>
-        <div class="fr3-panel compare-grid three-col" id="fr3-nominal" data-panel="nominal" data-cols="3">
+        <div class="tab-panel fr3-panel compare-grid three-col" id="fr3-nominal" data-group="fr3" data-panel="nominal" data-cols="3">
                 <div class="video-tile is-ours">
                     <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_nominal_sack.mp4" type="video/mp4"></video>
                     <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_nominal_sack.mp4" type="video/mp4"></video>
@@ -767,7 +770,7 @@
                     <div class="tile-label"><span><span class="method-dot" style="--c: var(--nk);"></span><strong>NK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> corridor violation</span></div>
                 </div>
         </div>
-        <div class="fr3-panel compare-grid three-col" id="fr3-torque" data-panel="torque" data-cols="3" style="display:none;">
+        <div class="tab-panel fr3-panel compare-grid three-col" id="fr3-torque" data-group="fr3" data-panel="torque" data-cols="3" style="display:none;">
                 <div class="video-tile is-ours">
                     <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_torque_sack.mp4" type="video/mp4"></video>
                     <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_torque_sack.mp4" type="video/mp4"></video>
@@ -848,20 +851,49 @@
             </div>
         </div>
 
-        <!-- Placeholder: replace with hardware recordings when available, e.g.
-        <div class="compare-grid mt-4">
-            <div class="video-tile is-ours">
-                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/tb3_oc_eccentric_sack.mp4" type="video/mp4"></video>
-                <div class="tile-label"><span><strong>SACK</strong> &middot; eccentric ring, open circuit</span></div>
+        <h3 class="title is-4 task-title mt-5">SACK on hardware</h3>
+        <div class="fr3-toolbar">
+            <div class="tabs is-toggle is-small is-toggle-rounded mb-0">
+                <ul>
+                    <li class="is-active" data-group="tb3" data-tab="oc"><a>Open circuit</a></li>
+                    <li data-group="tb3" data-tab="cc"><a>Closed circuit</a></li>
+                </ul>
             </div>
-            ...
+            <button class="button is-small is-rounded is-light" data-restart="tb3">
+                <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart</span>
+            </button>
         </div>
-        -->
-        <div class="video-placeholder mt-4">
-            <i class="fas fa-video"></i>
-            <strong>Hardware videos coming soon</strong>
-            <span>Nominal, axisymmetric-ring and eccentric-ring runs on both tracks</span>
+        <div class="tab-panel tb3-panel" data-group="tb3" data-panel="oc">
+            <div class="video-tile is-ours">
+                <video muted loop playsinline preload="metadata"><source src="static/videos/sack_base.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>Nominal robot</strong> &middot; no ring</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
+            </div>
+            <div class="video-tile is-ours">
+                <video muted loop playsinline preload="metadata"><source src="static/videos/sack_circ.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>Axisymmetric ring</strong> &middot; left wheel</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
+            </div>
+            <div class="video-tile is-ours">
+                <video muted loop playsinline preload="metadata"><source src="static/videos/sack_ecc.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>Eccentric ring</strong> &middot; left wheel</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
+            </div>
         </div>
+        <div class="tab-panel tb3-panel" data-group="tb3" data-panel="cc" style="display:none;">
+            <div class="video-tile is-ours">
+                <video muted loop playsinline preload="metadata"><source src="static/videos/sack_base_expt_2.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>Nominal robot</strong> &middot; no ring</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
+            </div>
+            <div class="video-tile is-ours">
+                <video muted loop playsinline preload="metadata"><source src="static/videos/sack_circ_expt_3.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>Axisymmetric ring</strong> &middot; left wheel</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
+            </div>
+            <div class="video-tile is-ours">
+                <video muted loop playsinline preload="metadata"><source src="static/videos/sack_ecc_expt_2.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>Eccentric ring</strong> &middot; left wheel</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
+            </div>
+        </div>
+        <p class="figure-caption mb-0">SACK runs on the TurtleBot3 with the model trained only in Gazebo, under increasing mismatch: nominal wheels,
+            an axisymmetric ring that enlarges the left wheel's effective radius, and an eccentric ring that makes it vary periodically.
+            Use the toggle to switch between the open-circuit and closed-circuit obstacle courses.</p>
 
         <div class="figure-card mt-4">
             <img src="static/images/tb3_trials_distribution.png" alt="Distribution of SACK trajectories across 20 hardware trials">
@@ -976,15 +1008,15 @@
     }
 
 
-    // FR3 condition tabs: show one panel, restart its videos together.
+    // Tabbed video panels (FR3 conditions, TurtleBot3 tracks): show one panel, restart its videos together.
     function playPanel(panel) {
-        const vids = panel.querySelectorAll('video');
-        vids.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+        panel.querySelectorAll('video').forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
     }
-    document.querySelectorAll('[data-tab]').forEach(tab => {
+    document.querySelectorAll('li[data-tab]').forEach(tab => {
         tab.addEventListener('click', () => {
-            document.querySelectorAll('[data-tab]').forEach(t => t.classList.toggle('is-active', t === tab));
-            document.querySelectorAll('.fr3-panel').forEach(p => {
+            const g = tab.dataset.group;
+            document.querySelectorAll(`li[data-tab][data-group="${g}"]`).forEach(t => t.classList.toggle('is-active', t === tab));
+            document.querySelectorAll(`.tab-panel[data-group="${g}"]`).forEach(p => {
                 const on = p.dataset.panel === tab.dataset.tab;
                 p.style.display = on ? '' : 'none';
                 p.querySelectorAll('video').forEach(v => v.pause());
@@ -992,8 +1024,12 @@
             });
         });
     });
-    document.querySelector('[data-sync-fr3]').addEventListener('click', () => {
-        document.querySelectorAll('.fr3-panel').forEach(p => { if (p.style.display !== 'none') playPanel(p); });
+    document.querySelectorAll('[data-restart]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll(`.tab-panel[data-group="${btn.dataset.restart}"]`).forEach(p => {
+                if (p.style.display !== 'none') playPanel(p);
+            });
+        });
     });
 
     // Copy BibTeX.
