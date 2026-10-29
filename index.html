@@ -33,7 +33,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+    <!-- FR3 comparison layout (kept inline so it works with any copy of style.css) -->
+    <style>
+        .fr3-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+        .fr3-toolbar .tabs.is-toggle li.is-active a { background: #15803d; border-color: #15803d; }
+        .fr3-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px; }
+        .fr3-panel .video-tile video.fr3-plot { border-top: 1px solid #e2e8f0; }
+        @media (max-width: 768px) { .fr3-panel { grid-template-columns: 1fr !important; } }
+    </style>
 </head>
 
 <body>
@@ -737,7 +746,7 @@
                 <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart</span>
             </button>
         </div>
-        <div class="fr3-panel compare-grid three-col" id="fr3-nominal" data-panel="nominal">
+        <div class="fr3-panel compare-grid three-col" id="fr3-nominal" data-panel="nominal" data-cols="3">
                 <div class="video-tile is-ours">
                     <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_nominal_sack.mp4" type="video/mp4"></video>
                     <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_nominal_sack.mp4" type="video/mp4"></video>
@@ -754,7 +763,7 @@
                     <div class="tile-label"><span><span class="method-dot" style="--c: var(--nk);"></span><strong>NK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> corridor violation</span></div>
                 </div>
         </div>
-        <div class="fr3-panel compare-grid three-col" id="fr3-torque" data-panel="torque" style="display:none;">
+        <div class="fr3-panel compare-grid three-col" id="fr3-torque" data-panel="torque" data-cols="3" style="display:none;">
                 <div class="video-tile is-ours">
                     <video muted loop playsinline preload="metadata"><source src="static/videos/fr3_gazebo_torque_sack.mp4" type="video/mp4"></video>
                     <video class="fr3-plot" muted loop playsinline preload="metadata"><source src="static/videos/fr3_plot_torque_sack.mp4" type="video/mp4"></video>
