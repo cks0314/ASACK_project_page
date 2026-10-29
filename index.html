@@ -44,7 +44,19 @@
         .tb3-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 0.6rem; }
         .tb3-panel .video-tile { border: 2px solid #15803d; }
         .tb3-panel .tile-label { flex-direction: column; align-items: flex-start; gap: 0.15rem; }
-        @media (max-width: 768px) { .fr3-panel, .tb3-panel { grid-template-columns: 1fr !important; } }
+        .tb3-panel video { width: 100%; height: auto; object-fit: cover; background: #0f172a; }
+        /* Open circuit (side view): one run per row, wall above and empty floor below cropped away */
+        .tb3-oc { grid-template-columns: 1fr; }
+        .tb3-oc .video-tile { flex-direction: row; align-items: stretch; }
+        .tb3-oc video { aspect-ratio: 3.4 / 1; object-position: 50% 76%; flex: 1; min-width: 0; }
+        .tb3-oc .tile-label { width: 190px; flex-shrink: 0; justify-content: center; border-top: none; border-left: 1px solid #e2e8f0; }
+        /* Closed circuit (top-down view): square crop centred on the track */
+        .tb3-cc video { aspect-ratio: 1 / 1; object-position: 55% 50%; }
+        @media (max-width: 768px) {
+            .fr3-panel, .tb3-panel { grid-template-columns: 1fr !important; }
+            .tb3-oc .video-tile { flex-direction: column; }
+            .tb3-oc .tile-label { width: auto; border-left: none; border-top: 1px solid #e2e8f0; }
+        }
         .four-col { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 8px; }
         .four-col .tile-label { flex-direction: column; align-items: flex-start; gap: 0.15rem; padding: 0.45rem 0.6rem; }
         @media (max-width: 900px) { .four-col { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
@@ -863,7 +875,7 @@
                 <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart</span>
             </button>
         </div>
-        <div class="tab-panel tb3-panel" data-group="tb3" data-panel="oc">
+        <div class="tab-panel tb3-panel tb3-oc" data-group="tb3" data-panel="oc">
             <div class="video-tile is-ours">
                 <video muted loop playsinline preload="metadata"><source src="static/videos/sack_base.mp4" type="video/mp4"></video>
                 <div class="tile-label"><span><strong>Nominal robot</strong> &middot; no ring</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
@@ -877,7 +889,7 @@
                 <div class="tile-label"><span><strong>Eccentric ring</strong> &middot; left wheel</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
             </div>
         </div>
-        <div class="tab-panel tb3-panel" data-group="tb3" data-panel="cc" style="display:none;">
+        <div class="tab-panel tb3-panel tb3-cc" data-group="tb3" data-panel="cc" style="display:none;">
             <div class="video-tile is-ours">
                 <video muted loop playsinline preload="metadata"><source src="static/videos/sack_base_expt_2.mp4" type="video/mp4"></video>
                 <div class="tile-label"><span><strong>Nominal robot</strong> &middot; no ring</span><span class="outcome safe"><i class="fas fa-check"></i> 0 unsafe steps</span></div>
