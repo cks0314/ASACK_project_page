@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SACK: Safe Active Continual Koopman Learning</title>
+    <meta name="description"
+          content="Project page for SACK: Safe Active Continual Koopman Learning for Uncertain Systems with Contractive Guarantees.">
+    <meta property="og:title" content="SACK: Safe Active Continual Koopman Learning">
+    <meta property="og:description" content="Contractive online Koopman adaptation, D-optimal active learning and certified safety under distributional shift.">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '\\[', right: '\\]', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false}
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        });"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans:400,500,600,700|Castoro:400,400i" rel="stylesheet">
+
+    <!-- Bulma / icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+
+<!-- STICKY NAV -->
+<nav class="top-nav">
+    <div class="nav-inner">
+        <span class="brand">SACK</span>
+        <a class="nav-link" href="#abstract">Abstract</a>
+        <a class="nav-link" href="#motivation">Motivation</a>
+        <a class="nav-link" href="#contributions">Contributions</a>
+        <a class="nav-link" href="#method">Method</a>
+        <a class="nav-link" href="#results">Results</a>
+        <a class="nav-link" href="#hardware">Hardware</a>
+        <a class="nav-link" href="#discussion">Discussion</a>
+        <a class="nav-link" href="#citation">BibTeX</a>
+    </div>
+</nav>
+
+<!-- ===================================================== HERO -->
+<section class="hero hero-band">
+    <div class="hero-body pb-4">
+        <div class="container is-max-desktop has-text-centered">
+            <span class="tag is-medium is-rounded venue-tag">Preprint</span>
+            <br><br>
+
+            <h1 class="title is-1 publication-title">
+                <span class="acronym">SACK</span>: Safe Active<br>Continual Koopman Learning
+            </h1>
+            <h2 class="subtitle is-4 mt-2">for Uncertain Systems with Contractive Guarantees</h2>
+
+            <div class="is-size-5 publication-authors mt-4">
+                <span class="author-block"><strong>Chandan Kumar Sah</strong><sup>*</sup></span>
+                &nbsp;&nbsp;
+                <span class="author-block"><strong>Rajpal Singh</strong><sup>*</sup></span>
+                &nbsp;&nbsp;
+                <span class="author-block">Jishnu Keshavan</span>
+            </div>
+            <div class="is-size-6 publication-authors mt-2">
+                Department of Mechanical Engineering, Indian Institute of Science, Bengaluru
+            </div>
+            <div class="equal-note mt-1"><sup>*</sup> Equal contribution</div>
+
+            <div class="buttons is-centered mt-5 link-buttons">
+                <a href="static/pdfs/SACK_paper.pdf" target="_blank" class="button is-dark is-rounded">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper</span>
+                </a>
+                <!-- TODO: replace with arXiv URL -->
+                <a href="#" class="button is-dark is-rounded">
+                    <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
+                </a>
+                <!-- TODO: replace with repository URL -->
+                <a href="#" class="button is-dark is-rounded">
+                    <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+                </a>
+                <!-- TODO: replace with video URL -->
+                <a href="#" class="button is-dark is-rounded">
+                    <span class="icon"><i class="fab fa-youtube"></i></span><span>Video</span>
+                </a>
+                <a href="#citation" class="button is-dark is-rounded">
+                    <span class="icon"><i class="fas fa-quote-right"></i></span><span>BibTeX</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HERO VIDEOS: SACK on different systems -->
+<section class="section section-compact pt-2">
+    <div class="container is-max-desktop">
+        <div class="hero-grid">
+            <div class="video-tile tile-a">
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/3r_corridor_sack.mp4" type="video/mp4">
+                </video>
+                <div class="tile-label">
+                    <span><strong>3R manipulator</strong> &middot; corridor tracking, link masses &minus;60%</span>
+                    <span class="tile-chip">SACK</span>
+                </div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/quad_obs_sack.mp4" type="video/mp4">
+                </video>
+                <div class="tile-label">
+                    <span><strong>Planar quadrotor</strong> &middot; +30% mass, 5 m/s wind</span>
+                    <span class="tile-chip">SACK</span>
+                </div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="auto">
+                    <source src="static/videos/quad_cooperative_sack.mp4" type="video/mp4">
+                </video>
+                <div class="tile-label">
+                    <span><strong>Two quadrotors</strong> &middot; cooperative navigation, +20% mass, 3 m/s wind</span>
+                    <span class="tile-chip">SACK</span>
+                </div>
+            </div>
+        </div>
+        <p class="has-text-centered hero-caption mt-5">
+            <strong>SACK</strong> adapts an offline Koopman model <span class="hl-blue">online, in closed form</span>,
+            actively collects <span class="hl-blue">informative data</span> while doing the task, and keeps the robot
+            <span class="hl-green">inside the safe set</span> while its model is still changing.
+        </p>
+    </div>
+</section>
+
+<!-- STATS STRIP -->
+<section class="section py-4">
+    <div class="container is-max-desktop">
+        <div class="stat-strip">
+            <div class="stat-card">
+                <div class="stat-value">~10&times;</div>
+                <div class="stat-label">faster model settling than neural adaptive Koopman on the 3R arm (0.12 s vs 1.17 s)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">10<sup>&minus;2</sup> m</div>
+                <div class="stat-label">tracking RMSE maintained across a &minus;90% to +90% link-mass sweep</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">collisions for the quadrotor under mass + wind shift; every baseline collides</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0 / 20</div>
+                <div class="stat-label">TurtleBot3 hardware trials with any entry into the unsafe set</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== ABSTRACT -->
+<section class="section section-compact" id="abstract">
+    <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered section-title">Abstract</h2>
+        <div class="content abstract-content p-5 mt-4">
+            <p class="has-text-justified" style="line-height: 1.75;">
+                Koopman operator theory represents nonlinear dynamics through a linear operator acting on lifted observables,
+                enabling linear control techniques for nonlinear systems. However, Koopman models are typically learned offline
+                and often degrade under <span class="hl-red">model uncertainty and distributional shift</span> between training and deployment.
+                Existing adaptive Koopman methods either incur significant computational overhead or lack formal safety guarantees,
+                limiting their use in real-time, safety-critical robotics. We propose <strong>SACK</strong>, a unified framework for
+                safe continual Koopman learning that enables efficient online adaptation during task execution. A nominal Koopman
+                model is first learned offline and then refined through a <span class="hl-blue">contractive adaptation law</span> with
+                theoretical convergence guarantees. To improve data efficiency, the framework integrates an
+                <span class="hl-blue">active learning strategy</span> that acquires informative data while accomplishing task objectives.
+                We derive explicit bounds on model uncertainty and incorporate them within a <span class="hl-blue">robust MPC</span> to
+                establish formal safety guarantees, and introduce a <span class="hl-blue">conformal prediction-based tightening</span>
+                mechanism that calibrates safety margins online from observed residuals to reduce conservatism. Extensive simulations
+                and hardware experiments across diverse robotic platforms demonstrate superior performance over state-of-the-art
+                methods in safety-critical environments.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== MOTIVATION -->
+<section class="section section-compact section-alt" id="motivation">
+    <div class="container is-max-desktop">
+        <span class="section-kicker">Motivation</span>
+        <h2 class="title is-3 has-text-centered section-title">A learned model is only as good as its training data</h2>
+        <p class="section-lede">
+            Payload changes, wind, actuator wear and the sim-to-real gap all move the deployed dynamics away from those seen in
+            training. Adapting online is the natural fix, but it creates two problems that pull against each other.
+        </p>
+
+        <div class="tension-row">
+            <div class="tension-card">
+                <h4><i class="fas fa-wave-square mr-2" style="color: var(--c-active);"></i>Learning needs excitation</h4>
+                <p>
+                    Tracking controllers produce smooth, correlated trajectories. The regressors become nearly collinear, the
+                    data Gramian becomes ill-conditioned, and online adaptation <span class="hl-blue">stalls exactly when it is needed</span>.
+                    Deliberate excitation helps, but it costs task performance.
+                </p>
+            </div>
+            <div class="tension-vs">vs.</div>
+            <div class="tension-card">
+                <h4><i class="fas fa-shield-halved mr-2" style="color: var(--c-safe);"></i>Safety needs an accurate model</h4>
+                <p>
+                    Constraints enforced with an inaccurate, continually changing model are not guaranteed to hold. The risk peaks
+                    right after a shift, when new information is <span class="hl-blue">most valuable</span> but the model used to plan
+                    exploratory actions is <span class="hl-blue">least reliable</span>.
+                </p>
+            </div>
+        </div>
+
+        <div class="question-callout mt-5">
+            <div class="has-text-centered mb-3">
+                <span class="uppercase-label">
+                    <i class="fas fa-lightbulb mr-2" style="color: #eab308;"></i> Central research question
+                </span>
+            </div>
+            <h3 class="callout-question has-text-centered">
+                &ldquo;How can a robot adapt its learned dynamics under distributional shift without sacrificing safety
+                during closed-loop operation?&rdquo;
+            </h3>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== CONTRIBUTIONS -->
+<section class="section section-compact" id="contributions">
+    <div class="container is-max-desktop">
+        <span class="section-kicker">Contributions</span>
+        <h2 class="title is-3 has-text-centered section-title">What SACK brings together</h2>
+        <p class="section-lede">
+            The adaptation law, the exploration objective and the safety margins are derived from the same quantity: the
+            regressor Gramian that governs how fast the model error contracts.
+        </p>
+
+        <div class="contrib-grid">
+            <div class="contrib-card" style="--c: var(--c-adapt);">
+                <span class="num">01</span>
+                <h4>Contractive continual Koopman adaptation</h4>
+                <p>A closed-form, windowed recursive update for the Koopman matrices with <span class="hl-blue">exponential contraction</span>
+                    of the estimation error under persistent excitation, and an explicit ultimate bound when the true dynamics drift.</p>
+            </div>
+            <div class="contrib-card" style="--c: var(--c-active);">
+                <span class="num">02</span>
+                <h4>Active data acquisition coupled to adaptation</h4>
+                <p>A <span class="hl-blue">D-optimal</span> log-det objective on the predicted regressor Gramian inside receding-horizon
+                    control, with a certified lower bound on its minimum eigenvalue that links exploration directly to contraction.</p>
+            </div>
+            <div class="contrib-card" style="--c: var(--c-safe);">
+                <span class="num">03</span>
+                <h4>Safety-aware continual learning</h4>
+                <p>Model-error bounds propagated into <span class="hl-blue">tightened CBF constraints</span> for recursive feasibility and
+                    forward invariance, plus <span class="hl-blue">conformal residual calibration</span> for less conservative margins with
+                    probabilistic coverage.</p>
+            </div>
+            <div class="contrib-card" style="--c: var(--sack);">
+                <span class="num">04</span>
+                <h4>Validation across diverse robots</h4>
+                <p>A 3R manipulator, single and cooperative planar quadrotors, a 7-DoF Franka Research 3 in Gazebo, and a
+                    <span class="hl-blue">TurtleBot3 in hardware</span> with deliberately induced wheel mismatch.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== METHOD -->
+<section class="section section-compact section-alt" id="method">
+    <div class="container is-max-desktop">
+        <span class="section-kicker">Method</span>
+        <h2 class="title is-3 has-text-centered section-title">The SACK architecture</h2>
+        <p class="section-lede">
+            Offline, an autoencoder learns the lifting map $\psi(\cdot)$ and nominal matrices $(A,B,C)$. Online, $\psi$ and $C$
+            stay fixed while $(A,B)$ are adapted at every step, feeding an active-learning MPC whose safety constraints are
+            tightened by the current model uncertainty.
+        </p>
+
+        <div class="figure-card mb-5">
+            <img src="static/images/sack_architecture.png" alt="SACK architecture: offline training block, adaptive module, safety tightening and active-learning MPC">
+            <p class="figure-caption">
+                <strong>Figure 1.</strong> Offline (top), the lifting map and nominal Koopman matrices are identified from nominal
+                input&ndash;output data. Online (bottom), the <span style="color: var(--c-adapt); font-weight:600;">adaptive module</span>
+                updates $\hat W_k = [\hat A_k, \hat B_k]$ from windowed prediction errors; the
+                <span style="color: var(--c-safe); font-weight:600;">safety-tightening module</span> computes the one-step margin
+                $\delta_{x,k}$ (analytical or conformal); and the
+                <span style="color: var(--c-active); font-weight:600;">active-learning MPC</span> jointly performs tracking,
+                information-seeking excitation and safety-constrained control.
+            </p>
+        </div>
+
+        <!-- Lifted model -->
+        <div class="method-block" style="--c: var(--c-offline);">
+            <div class="method-head">
+                <span class="method-badge">0</span>
+                <h3 class="title is-4">Koopman lifted model and its error</h3>
+            </div>
+            <p class="prose">
+                A dictionary of observables $z_k = \psi(x_k)$, which contains the state itself, lifts the dynamics into a space
+                where they are approximately linear. Predictions over a horizon are then affine in the inputs, so MPC reduces to a QP:
+            </p>
+            <div class="eq-box">
+                $$\hat z_{k+1|k} = A z_k + B u_k, \qquad \hat x_{k+1|k} = C\,\hat z_{k+1|k}, \qquad C = [\,I_{n_x}\;\; 0\,].$$
+            </div>
+            <p class="prose mb-0">
+                The realized error splits into a <em>truncation</em> term fixed by the dictionary and a <em>parameter-mismatch</em>
+                term that is linear in the regressor $v_k = [z_k^\top, u_k^\top]^\top$. Distributional shift inflates the mismatch
+                term, and because it enters linearly it can be removed online by refining $(A,B)$ alone.
+            </p>
+        </div>
+
+        <!-- Adaptation -->
+        <div class="method-block" style="--c: var(--c-adapt);">
+            <div class="method-head">
+                <span class="method-badge">1</span>
+                <h3 class="title is-4">Contractive online adaptation</h3>
+            </div>
+            <p class="prose">
+                Using the $w$ most recent regressor&ndash;observation pairs $(V_k, Z_k^+)$ with exponential forgetting
+                $\Gamma = \mathrm{diag}(\gamma^{w-1},\dots,\gamma,1)$, the Koopman matrices are updated in closed form&mdash;no
+                gradient steps, no network retraining:
+            </p>
+            <div class="eq-box">
+                $$\hat W_{k+1} = \hat W_k + \eta\, E_k^{\text{pred}}\,\Gamma V_k^\top, \qquad E_k^{\text{pred}} := Z_k^+ - \hat W_k V_k .$$
+            </div>
+            <p class="prose">
+                The estimation error $E_k = W_k^* - \hat W_k$ then evolves through the weighted regressor Gramian
+                $G_k = V_k \Gamma V_k^\top$:
+            </p>
+            <div class="eq-box">
+                $$E_{k+1} = E_k\,(I - \eta G_k) + \tilde\Delta_k, \qquad \|\tilde\Delta_k\|_F \le \nu_{\text{eff}} .$$
+            </div>
+            <div class="guarantee">
+                <span class="icon-wrap"><i class="fas fa-certificate"></i></span>
+                <div>
+                    <span class="label">Theorem 1 &middot; exponential contraction</span>
+                    If $\lambda_{\min}(G_k) \ge \underline\lambda > 0$ and $0 < \eta < 2/\bar\lambda$, then
+                    $\|E_k\|_F \le \rho^k \|E_0\|_F + \frac{1-\rho^k}{1-\rho}\,\nu_{\text{eff}}$ with $\rho < 1$, so
+                    $\limsup_{k\to\infty}\|E_k\|_F \le \nu_{\text{eff}}/(1-\rho)$. The rate is set by the conditioning of $G_k$,
+                    and Lemma 2 relaxes the requirement to excitation over a <em>block</em> of $T$ steps, so windows shorter
+                    than the regressor dimension are admissible.
+                </div>
+            </div>
+            <p class="figure-caption mb-0">
+                The forgetting factor caps the drift-induced bias: for $\gamma &lt; 1$ the inflation term in $\nu_{\text{eff}}$ is
+                bounded independently of the window length, which justifies moderate windows with exponential forgetting.
+            </p>
+        </div>
+
+        <!-- Active learning -->
+        <div class="method-block" style="--c: var(--c-active);">
+            <div class="method-head">
+                <span class="method-badge">2</span>
+                <h3 class="title is-4">D-optimal active-learning MPC</h3>
+            </div>
+            <p class="prose">
+                Since conditioning of the Gramian is the lever on the convergence rate, the MPC directly rewards it. The predicted
+                matrix $S_k(U)$ stacks the stored regressors (with their forgetting weights) and the planned ones (with unit weight),
+                and the controller trades tracking against information through the exploration weight $\beta$:
+            </p>
+            <div class="eq-box">
+                $$\min_{U}\; \sum_{i=k}^{k+N_p-1} \Big(\|C\hat z_{i|k} - x_{\text{ref},i}\|_Q^2 + \|u_{i|k}\|_R^2\Big) \;-\; \beta \log\det\!\big(S_k(U) + \varepsilon I\big)$$
+                $$\text{s.t.}\quad \hat z_{i+1|k} = \hat A_k \hat z_{i|k} + \hat B_k u_{i|k},\quad u_{i|k}\in\mathcal U^t_{i-k},\; \hat z_{i|k}\in\mathcal Z^t_{i-k},\; \hat z_{k+N_p|k}\in\mathcal Z_f,$$
+                $$h\big(C\hat z_{i+1|k}\big) \ge (1-\alpha_{\text{cbf}})\,h\big(C\hat z_{i|k}\big) + L_h\,\sigma_{i-k}.$$
+            </div>
+            <p class="prose">
+                The log-det penalizes small eigenvalues most heavily, so it pushes excitation into the directions that are
+                <span class="hl-blue">weak in the data already stored</span>, rather than over-exciting directions that are already
+                informative. The nonconvex problem is solved in real time by SQP, with each subproblem a standard QP.
+            </p>
+            <div class="guarantee">
+                <span class="icon-wrap"><i class="fas fa-certificate"></i></span>
+                <div>
+                    <span class="label">Theorem 2 &middot; excitation certificate</span>
+                    If some feasible input sequence $U^{\text{good}}$ achieves $\lambda_{\min}(S_k) \ge \lambda_0$ and $\beta$ is large
+                    enough, every feasible $U$ with $J(U) \le J(U^{\text{good}})$&mdash;in particular the optimizer&mdash;satisfies
+                    $\lambda_{\min}(S_k(U)) \ge \lambda^* > 0$. The optimizer cannot sacrifice all excitation to improve tracking.
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety -->
+        <div class="method-block" style="--c: var(--c-safe);">
+            <div class="method-head">
+                <span class="method-badge">3</span>
+                <h3 class="title is-4">Safety under a changing model</h3>
+            </div>
+            <p class="prose">
+                The one-step prediction error $d_k = E_k v_k$ enters the true transition as a bounded disturbance. SACK supplies
+                the CBF margin $\delta_{x,k}$ in one of two complementary ways:
+            </p>
+
+            <div class="two-regime">
+                <div class="regime-card">
+                    <span class="tag is-warning is-light">Deterministic</span>
+                    <h4>Analytical bound</h4>
+                    <p>Propagates the adaptation bound into a worst-case margin and horizon-wise constraint tightening:</p>
+                    <div class="eq-box">$$\delta^{\text{ana}}_{x,k} = \|C\|_2\, v_{\max}\, \bar E_k .$$</div>
+                    <p><strong>Theorem 3:</strong> recursive feasibility of the MPC, forward invariance $x_k \in \mathcal S$ for all $k$,
+                        and ultimately bounded prediction error. Can become conservative when excitation is weak.</p>
+                </div>
+                <div class="regime-card">
+                    <span class="tag is-info is-light">Probabilistic</span>
+                    <h4>Conformal calibration</h4>
+                    <p>Scores the residual not anticipated by an EMA of past discrepancies and takes a finite-sample quantile:</p>
+                    <div class="eq-box">$$\delta^{\text{conf}}_k = \hat Q_{1-\chi}\big(\{r_j\}_{j\in\mathcal W_k}\big) + \|\hat s_{k-1}\|_2 .$$</div>
+                    <p><strong>Theorem 4:</strong> per-step coverage $\mathbb P\big(h(x_{k+1}) \ge (1-\alpha_{\text{cbf}})h(x_k)\big) \ge 1-\chi$,
+                        and safety over any horizon $H &lt; 1/\chi$ with probability $\ge 1 - H\chi$.</p>
+                </div>
+            </div>
+            <p class="figure-caption mt-4 mb-0">
+                The two are complementary operating regimes rather than interchangeable guarantees: the analytical margin gives
+                deterministic robustness under explicit boundedness and excitation assumptions; the conformal margin trades
+                worst-case robustness for lower conservatism and relies on local exchangeability of recent residuals.
+            </p>
+        </div>
+
+        <!-- Algorithm -->
+        <div class="algo-card">
+            <div class="algo-title"><i class="fas fa-code mr-2"></i>Algorithm 1 &middot; SACK at a glance</div>
+            <ol>
+                <li><span class="kw">offline</span> &mdash; train the autoencoder to obtain $\psi(\cdot), A, B, C$; set $\hat W_0 \leftarrow [A,B]$.</li>
+                <li><span class="kw">for</span> each step $k$: lift $z_k \leftarrow \psi(x_k)$.</li>
+                <li>Build $V_{k-1}, Z^+_{k-1}, \Gamma$, compute $G_{k-1}$ and $E^{\text{pred}}_{k-1}$, and update $\hat W_k$ by the contractive law.</li>
+                <li>Compute the margin $\delta_{x,k}$ &mdash; analytical, or conformal (raw quantile during warm-up, EMA-corrected afterwards).</li>
+                <li>Solve the D-optimal active-learning MPC by SQP; apply $u_k^*$ and observe $x_{k+1}$.</li>
+                <li><span class="cm">// conformal mode: push the new residual $r_k$ into the calibration window</span></li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== RESULTS -->
+<section class="section section-compact" id="results">
+    <div class="container is-max-desktop">
+        <span class="section-kicker">Results</span>
+        <h2 class="title is-3 has-text-centered section-title">Evaluation across four robotic platforms</h2>
+        <p class="section-lede">
+            Every model is trained offline under nominal conditions and then deployed under post-training shift from
+            parameter changes, external disturbances, or the sim-to-real gap. All controllers use full-state feedback and ACADOS.
+        </p>
+
+        <div class="platform-grid">
+            <a class="platform-card" href="#exp-3r">
+                <div class="p-icon"><i class="fas fa-robot"></i></div>
+                <h4>3R manipulator</h4>
+                <p>Link-mass shifts from &minus;90% to +90%</p>
+                <span class="tag is-light">Simulation</span>
+            </a>
+            <a class="platform-card" href="#exp-quad">
+                <div class="p-icon"><i class="fas fa-helicopter"></i></div>
+                <h4>Planar quadrotor</h4>
+                <p>Mass increase plus time-varying wind</p>
+                <span class="tag is-light">Simulation</span>
+            </a>
+            <a class="platform-card" href="#exp-fr3">
+                <div class="p-icon"><i class="fas fa-gears"></i></div>
+                <h4>Franka Research 3</h4>
+                <p>Resistive joint torque, set-valued footprint constraint</p>
+                <span class="tag is-light">Gazebo</span>
+            </a>
+            <a class="platform-card" href="#hardware">
+                <div class="p-icon"><i class="fas fa-car-side"></i></div>
+                <h4>TurtleBot3</h4>
+                <p>Sim-to-real gap and modified wheels</p>
+                <span class="tag is-success is-light">Hardware</span>
+            </a>
+        </div>
+
+        <div class="legend-row">
+            <span class="legend-item"><span class="legend-swatch" style="--c: var(--sack);"></span><strong>SACK</strong> (ours)</span>
+            <span class="legend-item"><span class="legend-swatch" style="--c: var(--nk);"></span>NK &mdash; nominal Koopman, no adaptation</span>
+            <span class="legend-item"><span class="legend-swatch" style="--c: var(--nak);"></span>NAK &mdash; neural adaptive Koopman</span>
+            <span class="legend-item"><span class="legend-swatch" style="--c: var(--ack);"></span>AcK &mdash; EDMD active learning</span>
+            <span class="legend-item"><span class="legend-swatch" style="--c: var(--gmpc);"></span>GMPC &mdash; GP-based dual MPC</span>
+        </div>
+    </div>
+</section>
+
+<!-- ---------- 3R MANIPULATOR ---------- -->
+<section class="section section-compact section-alt" id="exp-3r">
+    <div class="container is-max-desktop">
+        <div class="exp-header">
+            <span class="exp-index">7.1</span>
+            <h2 class="title is-3 mb-0">3R serial manipulator</h2>
+        </div>
+
+        <div class="columns is-vcentered mt-3">
+            <div class="column is-5">
+                <div class="figure-card">
+                    <img src="static/images/3r_schematic.png" alt="3R serial manipulator schematic">
+                    <p class="figure-caption"><strong>Figure 2.</strong> Fully actuated 3R arm in a 3-D workspace; each joint rotates about its body $z$-axis.</p>
+                </div>
+            </div>
+            <div class="column is-7">
+                <p class="prose">
+                    The nominal model is trained for link mass $m_i = 0.6$ kg and length $l_i = 1$ m; distribution shift is induced by
+                    changing the link masses. The coupled rigid-body dynamics
+                    $M(\theta)\ddot\theta + C(\theta,\dot\theta)\dot\theta + G(\theta) = \tau$ make the input map configuration dependent,
+                    so the lifted model is only approximately linear&mdash;a good stress test for online adaptation.
+                </p>
+                <p class="prose mb-0">
+                    The reference trajectories are collision-free by design, so any controller that adapts fast enough should stay inside
+                    the corridor even without an explicit safety mechanism.
+                </p>
+            </div>
+        </div>
+
+        <h3 class="title is-4 task-title">Task 1 &mdash; Safe exploration in a constrained corridor
+            <span class="tag is-danger is-light shift">link masses &minus;60%</span></h3>
+        <p class="prose">
+            Only SACK and GMPC stay inside the corridor; NK, NAK and AcK leave it. The executed SACK trajectory deviates slightly from the
+            reference to explore informative directions, which is what lets the contractive update suppress the model error so quickly.
+        </p>
+
+        <div class="compare-toolbar">
+            <button class="button is-small is-rounded is-light" data-sync="grid-3r">
+                <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart in sync</span>
+            </button>
+        </div>
+        <div class="compare-grid" id="grid-3r">
+            <div class="video-tile is-ours">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/3r_corridor_sack.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--sack);"></span><strong>SACK (ours)</strong></span><span class="outcome safe"><i class="fas fa-check"></i> stays in corridor</span></div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/3r_corridor_nak.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--nak);"></span><strong>NAK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> corridor violation</span></div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/3r_corridor_ack.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--ack);"></span><strong>AcK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> diverges</span></div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/3r_corridor_nk.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--nk);"></span><strong>NK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> diverges</span></div>
+            </div>
+        </div>
+
+        <div class="figure-card mt-4">
+            <img src="static/images/3r_corridor_comparison.png" alt="3R corridor comparison: trajectories, collision events, prediction error, computation time">
+            <p class="figure-caption">
+                <strong>Figure 4.</strong> (a) End-effector trajectories in the corridor, red marking violations. (b) Collision events.
+                (c) Dynamic prediction error $e_{\text{dyn}}$. (d) Computation time per iteration; SACK-N is SACK without active learning ($\beta = 0$).
+            </p>
+        </div>
+
+        <div class="key-findings">
+            <div class="finding"><span class="big">0.12 s vs 1.17 s</span>Settling time of $e_{\text{dyn}}$ for SACK vs NAK&mdash;roughly ten times faster, and without NAK's secondary error spike.</div>
+            <div class="finding"><span class="big">~10<sup>4</sup>&times; cheaper</span>per iteration than GMPC, which stays safe but whose nonlinear MPC and online GP updates preclude real time.</div>
+            <div class="finding"><span class="big">Negligible overhead</span>from the adaptation law itself: SACK-N runs at the cost of NK; most of SACK's cost is the information objective.</div>
+        </div>
+
+        <div class="figure-card mt-5">
+            <img src="static/images/3r_corridor_obstacles.png" alt="3R corridor with obstacles: trajectory, obstacle distances, prediction error, conformal margin">
+            <p class="figure-caption">
+                <strong>Figure 3.</strong> Corridor with obstacles under a 40% link-mass reduction. (a) SACK traverses the corridor without
+                collision. (b) Distance to each obstacle stays above the safety boundary. (c) $e_{\text{dyn}}$ settles in about 0.1 s.
+                (d) The conformal margin $\delta_{x,k}$ shrinks as the model error falls.
+            </p>
+        </div>
+
+        <h3 class="title is-4 task-title">Task 2 &mdash; Tracking under parametric mismatch
+            <span class="tag is-danger is-light shift">link masses &minus;90% &rarr; +90%</span></h3>
+        <p class="prose">
+            With obstacles and corridors removed, SACK tracks hypotrochoid, petal and helix references with RMS errors of
+            <strong>0.0151</strong>, <strong>0.0159</strong> and <strong>0.0324 m</strong> at &minus;60% mass, and stays at the
+            $10^{-2}$ m level over the full sweep, while NK exceeds 3 m under moderate-to-large shifts.
+        </p>
+
+        <div class="figure-card">
+            <img src="static/images/3r_tracking_shapes.png" alt="3R tracking of hypotrochoid, petal and helix references">
+            <p class="figure-caption"><strong>Figure 5.</strong> Tracking under a 60% link-mass reduction: (a) hypotrochoid, (b) petal, (c) helix.</p>
+        </div>
+
+        <div class="columns is-vcentered mt-4">
+            <div class="column is-7">
+                <div class="figure-card">
+                    <img src="static/images/3r_mass_sweep.png" alt="RMSE versus mass change, with and without active learning">
+                    <p class="figure-caption"><strong>Figure 6.</strong> Tracking RMSE over a &minus;90% to +90% mass sweep. (a) SACK vs baselines.
+                        (b) Ablation: SACK without the information objective.</p>
+                </div>
+            </div>
+            <div class="column is-5">
+                <div class="finding">
+                    <span class="big">Active learning matters</span>
+                    Keeping the same adaptation law but setting $\beta = 0$ produces much larger errors under moderate-to-large shifts.
+                    Passive closed-loop data do not condition the regression problem well enough; actively shaping the data is what
+                    keeps adaptation reliable.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ---------- PLANAR QUADROTOR ---------- -->
+<section class="section section-compact" id="exp-quad">
+    <div class="container is-max-desktop">
+        <div class="exp-header">
+            <span class="exp-index">7.2</span>
+            <h2 class="title is-3 mb-0">Planar quadrotor</h2>
+        </div>
+
+        <div class="columns is-vcentered mt-3">
+            <div class="column is-7">
+                <p class="prose">
+                    An underactuated, agile platform with two thrust inputs. The model is trained with no wind
+                    ($m = 2$ kg, $I = 1$ kg&middot;m&sup2;, $l_{\text{arm}} = 0.2$ m). At deployment, a
+                    <span class="hl-blue">non-parametric wind disturbance</span> $F_w$ is added to a mass change, so the true Koopman
+                    operator drifts over time ($\nu &gt; 0$)&mdash;unlike the fixed parametric shifts of the manipulator.
+                </p>
+                <p class="prose mb-0">
+                    SACK updates the operator directly from lifted prediction errors, so it does not need to identify the individual
+                    sources of mismatch separately.
+                </p>
+            </div>
+            <div class="column is-5">
+                <div class="figure-card">
+                    <img src="static/images/quad_schematic.png" alt="Planar quadrotor schematic with wind gust">
+                    <p class="figure-caption"><strong>Figure 7.</strong> Planar quadrotor with thrusts $T_1, T_2$ under wind.</p>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="title is-4 task-title">Task 1 &mdash; Cooperative navigation under model mismatch
+            <span class="tag is-danger is-light shift">+20% mass, 3 m/s wind</span></h3>
+        <div class="columns is-vcentered">
+            <div class="column is-7">
+                <div class="video-tile is-ours" style="border: 2px solid var(--sack);">
+                    <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/quad_cooperative_sack.mp4" type="video/mp4"></video>
+                    <div class="tile-label"><span><span class="method-dot" style="--c: var(--sack);"></span><strong>SACK</strong> &middot; two agents, independent models and MPCs</span><span class="outcome safe"><i class="fas fa-check"></i> collision-free</span></div>
+                </div>
+            </div>
+            <div class="column is-5">
+                <p class="prose mb-0">
+                    Each quadrotor adapts its own Koopman model and solves its own MPC, with safety constraints covering both static
+                    obstacles and the other agent. Both traverse the obstacle field without collision, the inter-agent distance stays
+                    above the threshold, and $e_{\text{dyn}}$ settles in about <strong>0.05 s</strong>; a small $\beta = 10$ is enough
+                    because the quadrotor dynamics already excite the regressors richly.
+                </p>
+            </div>
+        </div>
+        <div class="figure-card mt-4">
+            <img src="static/images/quad_cooperative.png" alt="Two-quadrotor trajectories, inter-agent distance and prediction error">
+            <p class="figure-caption"><strong>Figure 8.</strong> (a) Closed-loop trajectories; arrows show wind direction and dashed circles
+                the obstacle safety boundaries. (b) Inter-agent distance. (c) Dynamic prediction error.</p>
+        </div>
+
+        <h3 class="title is-4 task-title">Task 2 &mdash; Safe tracking under severe mass and wind disturbance
+            <span class="tag is-danger is-light shift">+30% mass, 5 m/s wind</span></h3>
+        <p class="prose">
+            SACK is the only method that satisfies the obstacle constraints throughout. NAK reduces the mismatch but too slowly, so its
+            early predictions are wrong for long enough to cause violations; GMPC struggles because the wind is not part of its GP
+            input, so similar state&ndash;input pairs map to different residuals.
+        </p>
+
+        <div class="compare-toolbar">
+            <button class="button is-small is-rounded is-light" data-sync="grid-quad">
+                <span class="icon"><i class="fas fa-rotate-left"></i></span><span>Restart in sync</span>
+            </button>
+        </div>
+        <div class="compare-grid" id="grid-quad">
+            <div class="video-tile is-ours">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/quad_obs_sack.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--sack);"></span><strong>SACK (ours)</strong></span><span class="outcome safe"><i class="fas fa-check"></i> 0 collisions</span></div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/quad_obs_nak.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--nak);"></span><strong>NAK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> 75 events</span></div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/quad_obs_ack.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--ack);"></span><strong>AcK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> 236 events</span></div>
+            </div>
+            <div class="video-tile">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/quad_obs_nk.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><span class="method-dot" style="--c: var(--nk);"></span><strong>NK</strong></span><span class="outcome fail"><i class="fas fa-xmark"></i> 63 events</span></div>
+            </div>
+        </div>
+
+        <div class="figure-card mt-4">
+            <img src="static/images/quad_obstacle_comparison.png" alt="Planar quadrotor obstacle-constrained comparison">
+            <p class="figure-caption"><strong>Figure 9.</strong> (a) Closed-loop trajectories, red marking safety-boundary violations.
+                (b) Collision events&mdash;NK 63, NAK 75, GMPC 167, AcK 236, <strong>SACK 0</strong>. (c) Dynamic prediction error.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ---------- FRANKA ---------- -->
+<section class="section section-compact section-alt" id="exp-fr3">
+    <div class="container is-max-desktop">
+        <div class="exp-header">
+            <span class="exp-index">7.3</span>
+            <h2 class="title is-3 mb-0">Franka Research 3 (Gazebo)</h2>
+        </div>
+
+        <div class="columns is-vcentered mt-3">
+            <div class="column is-5">
+                <div class="figure-card">
+                    <img src="static/images/fr3_setup.jpg" alt="Franka Research 3 corridor setup in Gazebo">
+                    <p class="figure-caption"><strong>Figure 10.</strong> The full projected end-effector footprint (blue) must stay inside the safe region (green).</p>
+                </div>
+            </div>
+            <div class="column is-7">
+                <p class="prose">
+                    A 7-DoF arm tracks a reference through a narrow 3-D corridor under a <span class="hl-blue">set-valued</span>
+                    geometric constraint: motion is unsafe whenever <em>any</em> part of the end-effector footprint crosses the
+                    boundary, even if the reference point is inside. A resistive joint torque $\tau_d = -0.4\,\tau$ creates the
+                    post-training mismatch.
+                </p>
+                <p class="prose mb-0">
+                    Under both nominal and disturbed dynamics, SACK keeps the footprint inside the corridor while the conformal
+                    tightening adjusts to the residual uncertainty. NAK violates the boundary once the torque disturbance is applied;
+                    NK fails in both conditions.
+                </p>
+            </div>
+        </div>
+
+        <div class="figure-card mt-3">
+            <img src="static/images/fr3_corridor.png" alt="FR3 corridor tracking: SACK, NAK and NK under nominal and disturbed conditions">
+            <p class="figure-caption"><strong>Figure 11.</strong> (a&ndash;c) Nominal; (d&ndash;f) resistive torque $\tau_d = -0.4\,\tau$.
+                (a,d) SACK, (b,e) NAK, (c,f) NK. Red crosses mark corridor violations.</p>
+        </div>
+
+        <!-- Placeholder: replace with Gazebo recordings when available, e.g.
+        <div class="compare-grid mt-4">
+            <div class="video-tile is-ours">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/fr3_sack.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>SACK</strong></span></div>
+            </div>
+            ...
+        </div>
+        -->
+        <div class="video-placeholder mt-4">
+            <i class="fas fa-film"></i>
+            <strong>Gazebo recordings coming soon</strong>
+            <span>SACK vs NAK vs NK on the FR3 corridor task</span>
+        </div>
+    </div>
+</section>
+
+<!-- ---------- TURTLEBOT3 HARDWARE ---------- -->
+<section class="section section-compact" id="hardware">
+    <div class="container is-max-desktop">
+        <div class="exp-header">
+            <span class="exp-index">7.4</span>
+            <h2 class="title is-3 mb-0">Hardware experiments: TurtleBot3</h2>
+        </div>
+        <p class="prose mt-3">
+            The Koopman model is trained <span class="hl-blue">entirely in Gazebo</span> and deployed on a TurtleBot3 Burger. Here the
+            mismatch is not prescribed: SACK must handle the sim-to-real gap plus unmodeled hardware effects. Three configurations of
+            increasing mismatch are tested on an open-circuit (OC) and a closed-circuit (CC) obstacle course.
+        </p>
+
+        <div class="columns is-vcentered">
+            <div class="column is-6">
+                <div class="figure-card">
+                    <img src="static/images/tb3_platform.jpg" alt="TurtleBot3 Burger and wheel rings">
+                    <p class="figure-caption"><strong>Figure 12.</strong> (a) Nominal robot. (b) Axisymmetric ring that enlarges the left wheel's
+                        effective radius. (c) Eccentric ring that makes the radius vary periodically. (d) Ring mounted on the left wheel.</p>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="figure-card">
+                    <p class="has-text-weight-semibold mb-2" style="color: var(--ink);">Table 1 &middot; 20 hardware trials</p>
+                    <div class="table-container mb-0">
+                        <table class="result-table">
+                            <thead>
+                                <tr><th>Track</th><th>SACK</th><th>NAK</th><th>NK</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Open circuit</strong></td>
+                                    <td class="ours">0.244<span class="sub">0 unsafe steps</span></td>
+                                    <td>1.59<span class="sub">384 unsafe steps</span></td>
+                                    <td>1.26<span class="sub">76 unsafe steps</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Closed circuit</strong></td>
+                                    <td class="ours">0.112<span class="sub">0 unsafe steps</span></td>
+                                    <td>0.984<span class="sub">389 unsafe steps</span></td>
+                                    <td>1.329<span class="sub">669 unsafe steps</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="figure-caption">Average tracking RMSE (m) and average number of time steps in the unsafe set. The longer CC track lets
+                        SACK collect more informative data, which shows up as lower RMSE.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder: replace with hardware recordings when available, e.g.
+        <div class="compare-grid mt-4">
+            <div class="video-tile is-ours">
+                <video autoplay muted loop playsinline preload="metadata"><source src="static/videos/tb3_oc_eccentric_sack.mp4" type="video/mp4"></video>
+                <div class="tile-label"><span><strong>SACK</strong> &middot; eccentric ring, open circuit</span></div>
+            </div>
+            ...
+        </div>
+        -->
+        <div class="video-placeholder mt-4">
+            <i class="fas fa-video"></i>
+            <strong>Hardware videos coming soon</strong>
+            <span>Nominal, axisymmetric-ring and eccentric-ring runs on both tracks</span>
+        </div>
+
+        <div class="figure-card mt-4">
+            <img src="static/images/tb3_trials_distribution.png" alt="Distribution of SACK trajectories across 20 hardware trials">
+            <p class="figure-caption"><strong>Figure 13.</strong> Mean SACK trajectory and &plusmn;1 SD band across all 20 trials and configurations:
+                (a) open circuit, (b) closed circuit. The band tightens late in the CC track as adaptation accumulates data.</p>
+        </div>
+
+        <div class="columns is-vcentered mt-4">
+            <div class="column is-6">
+                <div class="figure-card">
+                    <img src="static/images/tb3_representative.png" alt="Representative TurtleBot3 trials under increasing mismatch">
+                    <p class="figure-caption"><strong>Figure 14.</strong> Representative trials on the open circuit (a&ndash;c) and closed circuit (d&ndash;f):
+                        nominal robot (a,d), axisymmetric ring (b,e), eccentric ring (c,f). Red crosses are safety-margin violations.</p>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="finding mb-3">
+                    <span class="big">Even the nominal robot breaks the baselines</span>
+                    NK and NAK violate the safety margins from the sim-to-real gap alone, and degrade further with the wheel rings.
+                </div>
+                <div class="finding">
+                    <span class="big">SACK: zero unsafe steps</span>
+                    in every trial, including the eccentric ring where the mismatch varies continuously during motion&mdash;repeatable
+                    safety rather than isolated successful runs.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== DISCUSSION -->
+<section class="section section-compact section-alt" id="discussion">
+    <div class="container is-max-desktop">
+        <span class="section-kicker">Discussion</span>
+        <h2 class="title is-3 has-text-centered section-title">Takeaways and limitations</h2>
+
+        <div class="columns mt-4">
+            <div class="column is-7">
+                <div class="takeaway-list">
+                    <div class="takeaway"><strong>Information sets the adaptation rate.</strong> Contraction is governed by the regressor
+                        Gramian, so exploration follows from the analysis rather than being an add-on heuristic.</div>
+                    <div class="takeaway"><strong>An update law alone is not enough.</strong> With exploration removed, the same law fails
+                        under large shifts: adaptation depends both on how parameters are updated and on the data they are updated from.</div>
+                    <div class="takeaway"><strong>Transient speed decides safety.</strong> Eventual model accuracy does not suffice&mdash;slow
+                        adaptation can mispredict long enough to violate constraints before converging.</div>
+                    <div class="takeaway"><strong>Refine locally instead of generalizing globally.</strong> The offline model provides a
+                        nominal lifted representation; continual refinement covers payloads, disturbances and hardware not seen in training.</div>
+                </div>
+            </div>
+            <div class="column is-5">
+                <div class="regime-card" style="background: #fff;">
+                    <h4><i class="fas fa-triangle-exclamation mr-2" style="color: var(--c-safe);"></i>Limitations &amp; future work</h4>
+                    <ul style="list-style: disc; margin-left: 1.1rem; font-size: 0.94rem; line-height: 1.65;">
+                        <li>The lifting map $\psi$ is fixed after training; shifts that change the needed observable subspace cannot be
+                            compensated by adapting $(A,B)$ alone.</li>
+                        <li>Worst-case analytical margins can be conservative and may make the MPC infeasible in tight spaces.</li>
+                        <li>The exploration weight $\beta$ is set or scheduled by hand; online tuning from Gramian conditioning is open.</li>
+                        <li>The information-seeking MPC is nonconvex; scaling to higher-dimensional and larger multi-agent systems needs
+                            more scalable objectives and solvers.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================== CITATION -->
+<section class="section section-compact" id="citation">
+    <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered section-title mb-4">Citation</h2>
+        <div class="bibtex-wrap">
+            <button class="button is-small is-rounded is-light copy-btn" id="copy-bib">
+                <span class="icon"><i class="far fa-copy"></i></span><span>Copy</span>
+            </button>
+<pre><code id="bibtex">@article{SACK2026,
+  title   = {SACK: Safe Active Continual Koopman Learning for Uncertain Systems with Contractive Guarantees},
+  author  = {Sah, Chandan Kumar and Singh, Rajpal and Keshavan, Jishnu},
+  journal = {Preprint},
+  year    = {2026}
+}</code></pre>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p class="mb-1">&copy; 2026 Chandan Kumar Sah, Rajpal Singh and Jishnu Keshavan &middot; Indian Institute of Science</p>
+    </div>
+</footer>
+
+<script>
+    // Restart every video in a comparison grid from t = 0 so the runs line up.
+    document.querySelectorAll('[data-sync]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const vids = document.querySelectorAll('#' + btn.dataset.sync + ' video');
+            vids.forEach(v => { v.pause(); v.currentTime = 0; });
+            Promise.all([...vids].map(v => v.readyState >= 2 ? Promise.resolve() :
+                new Promise(r => v.addEventListener('canplay', r, { once: true }))))
+                .then(() => vids.forEach(v => v.play().catch(() => {})));
+        });
+    });
+
+    // Pause off-screen videos to save CPU on long pages.
+    if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.play().catch(() => {}); }
+                else { e.target.pause(); }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('video').forEach(v => io.observe(v));
+    }
+
+    // Copy BibTeX.
+    document.getElementById('copy-bib').addEventListener('click', () => {
+        const text = document.getElementById('bibtex').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const label = document.querySelector('#copy-bib span:last-child');
+            label.textContent = 'Copied';
+            setTimeout(() => (label.textContent = 'Copy'), 1500);
+        });
+    });
+</script>
+
+</body>
+</html>
